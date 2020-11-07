@@ -1,11 +1,15 @@
+method MakeBigger(a: int, b: int) returns (res: int)
+    requires b > 0
+    ensures a < res
+{
+    res := a + b;
+}
+
 method Max(a: nat, b: nat) returns (res: nat)
     ensures res >= a && res >= b && (res == a || res == b)
 {
-    if a < b {
-      res := b;
-    } else {
-      res := a;
-    }
+    if a < b { res := b; }
+    else { res := a; }
 }
 
 method Max3(a: nat, b: nat, c: nat) returns (res: nat)
