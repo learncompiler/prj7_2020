@@ -1,3 +1,5 @@
+# 讨论文档：基本方法介绍
+
 对于一个函数，程序员会为它标注precondition和postcondition。我们需要证明的是，在precondition成立时，程序的行为保证postcondition一定被满足，并在无法证明时报错。代码中可能有assert语句，也需要证明assertion成立。此外，还需要隐含assertion来保证程序不会发生runtime error，例如除以零，数组下标越界等，它们被称为runtime assertion，也需要被证明。
 
 如果仅证明函数能够结束执行时符合postcondition，而不证明函数一定能够结束执行，则称为partial correctness。如果还证明函数能结束，则称为total correctness。
