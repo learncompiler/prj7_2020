@@ -1,11 +1,11 @@
 # prj7_2020 静态检查与程序验证
 
-## 相关工作
+## 主要目标
 
-1. Prusti：
-   论文：[Leveraging Rust Types for Modular Specification and Verification](http://pm.inf.ethz.ch/publications/getpdf.php?bibname=Own&id=AstrauskasMuellerPoliSummers19b.pdf)
-   项目：[GitHub](https://github.com/viperproject/prusti-dev)
-2. verasco：
-   论文：[A formally-verified C static analyzer](https://hal.inria.fr/hal-01078386/document)
-   项目：[GitHub](https://github.com/viperproject/prusti-dev)
+在MiniDecaf的某个子集上添加标注语法，并实现检查器，对程序进行验证。
 
+## 文件说明
+
+`code/dafny_example`下是以Dafny语法写的样例代码，将来可能修改后用于测试检查器。
+
+`doc`目录下是文档，包含每次集中讨论的讲稿，被它们间接引用的文档，以及将来可能的其他文档。这些文档都会在wiki中被直接或间接地引用。
