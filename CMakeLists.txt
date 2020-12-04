@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(MiniDecaf)
 
+add_compile_options(-lz3)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -lz3")
 set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -g -Wall")
 
 find_package(Java)
