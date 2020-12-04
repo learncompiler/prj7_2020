@@ -1,0 +1,36 @@
+build/**
+debug/**
+!debug/gen_makefile.sh
+
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+## ANTLR IGNORE
+generate/**
+!generate/*.g4
+*.tokens
+*.interp
