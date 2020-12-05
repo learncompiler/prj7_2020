@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(MiniDecaf)
+project(mdverif)
 
 add_compile_options(-lz3)
 set(CMAKE_CXX_STANDARD 14)
@@ -32,26 +32,26 @@ execute_process(
         ${PROJECT_SOURCE_DIR}/generate/
     # Note that this command runs in pure shell
     COMMAND
-    java -jar ${PROJECT_SOURCE_DIR}/third_party/antlr-4.8-complete.jar -Dlanguage=Cpp -no-listener -visitor MiniDecaf.g4
+    java -jar ${PROJECT_SOURCE_DIR}/third_party/antlr-4.8-complete.jar -Dlanguage=Cpp -no-listener -visitor mdverif.g4
 )
 
 file(GLOB src_dir
-    ${PROJECT_SOURCE_DIR}/generate/MiniDecafLexer.cpp
-    ${PROJECT_SOURCE_DIR}/generate/MiniDecafParser.cpp
-    ${PROJECT_SOURCE_DIR}/generate/MiniDecafVisitor.cpp
-    ${PROJECT_SOURCE_DIR}/generate/MiniDecafBaseVisitor.cpp
+    ${PROJECT_SOURCE_DIR}/generate/mdverifLexer.cpp
+    ${PROJECT_SOURCE_DIR}/generate/mdverifParser.cpp
+    ${PROJECT_SOURCE_DIR}/generate/mdverifVisitor.cpp
+    ${PROJECT_SOURCE_DIR}/generate/mdverifBaseVisitor.cpp
     ${PROJECT_SOURCE_DIR}/src/*.cpp
 )
 
-add_executable(MiniDecaf ${src_dir})
-target_link_libraries(MiniDecaf antlr4-cpp-runtime)
+add_executable(mdverif ${src_dir})
+target_link_libraries(mdverif antlr4-cpp-runtime)
 
 # Add custom target update_antlr, use `make update_antlr` to update your lexer & grammar rules anytime
 add_custom_target(update_antlr
     WORKING_DIRECTORY
         ${PROJECT_SOURCE_DIR}/generate/
     COMMAND 
-        java -jar ${PROJECT_SOURCE_DIR}/third_party/antlr-4.8-complete.jar -Dlanguage=Cpp -no-listener -visitor MiniDecaf.g4
+        java -jar ${PROJECT_SOURCE_DIR}/third_party/antlr-4.8-complete.jar -Dlanguage=Cpp -no-listener -visitor mdverif.g4
     COMMENT 
         "Auto updates for developing antlr grammar"
 )
