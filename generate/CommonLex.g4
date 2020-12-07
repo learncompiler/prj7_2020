@@ -40,6 +40,7 @@ LT : '<';
 LE : '<=';
 GT : '>';
 GE : '>=';
+Implies : '-->';
 
 
 // integer, identifier

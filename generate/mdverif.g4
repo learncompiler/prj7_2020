@@ -5,8 +5,14 @@ import CommonLex;
 program : function* EOF;
 
 function
-    : type Identifier '(' ')' compound_statement
+    : type Identifier '(' ')' condition* compound_statement
     ;
+
+condition : precondition | postcondition;
+
+precondition : 'requires' expression;
+
+postcondition : 'ensures' expression;
 
 type
     : 'int'
@@ -22,73 +28,66 @@ block_item
     ;
 
 statement
-    : 'return' expression ';'
-    | expression? ';'
-    | 'if' '(' expression ')' statement ('else' statement)?
-    | compound_statement
-    | 'for' '(' expression? ';' expression? ';' expression? ')' statement
-    | 'for' '(' declaration expression? ';' expression? ')' statement
-    | 'while' '(' expression ')' statement
-    | 'do' statement 'while' '(' expression ')' ';'
-    | 'break' ';'
-    | 'continue' ';'
+    : 'return' expression ';' # stmt1
+    | assignment ';' # stmt2
+    | ';' # stmt3
+    | compound_statement # stmt4
     ;
 
 declaration
     : type Identifier ('=' expression)? ';'
     ;
 
-expression
-    : assignment
-    ;
-
 assignment
-    : conditional
-    | Identifier '=' expression
+    : Identifier '=' expression
     ;
 
-conditional
-    : logical_or
-    | logical_or '?' expression ':' conditional
+expression
+    : logical_imply
+    ;
+
+logical_imply
+    : logical_or # logical_imply1
+    | logical_or '-->' logical_imply # logical_imply2
     ;
 
 logical_or
-    : logical_and
-    | logical_or '||' logical_and
+    : logical_and # logical_or1
+    | logical_or '||' logical_and # logical_or2
     ;
 
 logical_and
-    : equality
-    | logical_and '&&' equality
+    : equality # logical_and1
+    | logical_and '&&' equality # logical_and2
     ;
 
 equality
-    : relational
-    | equality ('=='|'!=') relational
+    : relational # equality1
+    | equality ('=='|'!=') relational # equality2
     ;
 
 relational
-    : additive
-    | relational ('<'|'>'|'<='|'>=') additive
+    : additive # relational1
+    | relational ('<'|'>'|'<='|'>=') additive # relational2
     ;
 
 additive
-    : multiplicative
-    | additive ('+'|'-') multiplicative
+    : multiplicative # additive1
+    | additive ('+'|'-') multiplicative # additive2
     ;
 
 multiplicative
-    : unary
-    | multiplicative ('*'|'/'|'%') unary
+    : unary # multiplicative1
+    | multiplicative ('*'|'/'|'%') unary # multiplicative2
     ;
 
 unary
-    : primary
-    | ('-'|'~'|'!') unary
+    : primary # unary1
+    | ('-'|'~'|'!') unary # unary2
     ;
 
 primary
-    : Integer
-    | '(' expression ')'
-    | Identifier
+    : Integer # primary1
+    | '(' expression ')' # primary2
+    | Identifier # primary3
     ;
