@@ -10,7 +10,7 @@ void Assume::maintain_vc(pExprTree &vc)
 Assert::Assert(pExprTree arg_expr): expr(arg_expr) {}
 void Assert::maintain_vc(pExprTree &vc)
 {
-    if (vc) vc = pExprTree(new BinaryLogic(BinaryLogic::and, expr, vc));
+    if (vc) vc = pExprTree(new BinaryLogic(BinaryLogic::and_logic, expr, vc));
     else vc = expr;
 }
 
@@ -29,8 +29,8 @@ Decrease::Decrease(std::vector<pExprTree> arg_ranking):
     ranking(std::move(arg_ranking)) {}
 void Decrease::maintain_vc(pExprTree &vc)
 {
-    pExprTree zero = new IntLiteral(0);
+    pExprTree zero = pExprTree(new IntLiteral(0));
     for (pExprTree ranking_f : ranking)
-        if (vc) vc = pExprTree(new BinaryLogic(BinaryLogic::and, vc, pExprTree(new BinaryCmp(BinaryCmp::ge, ranking_f, zero))));
+        if (vc) vc = pExprTree(new BinaryLogic(BinaryLogic::and_logic, vc, pExprTree(new BinaryCmp(BinaryCmp::ge, ranking_f, zero))));
         else vc = pExprTree(new BinaryCmp(BinaryCmp::ge, ranking_f, zero));
 }

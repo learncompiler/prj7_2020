@@ -75,8 +75,8 @@ class BinaryLogic : public BoolExpr // (bool, bool) -> bool
 public:
     enum BinaryLogicOp
     {
-        and,
-        or,
+        and_logic,
+        or_logic,
         imply,
     };
 private:

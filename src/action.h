@@ -8,7 +8,7 @@ public:
     virtual void maintain_vc(pExprTree &vc) = 0;
 };
 
-class Assume
+class Assume : public Action
 {
     pExprTree expr;
 public:
@@ -16,7 +16,7 @@ public:
     virtual void maintain_vc(pExprTree &vc) override;
 };
 
-class Assert
+class Assert : public Action
 {
     pExprTree expr;
 public:
@@ -24,7 +24,7 @@ public:
     virtual void maintain_vc(pExprTree &vc) override;
 };
 
-class Assign
+class Assign : public Action
 {
     pVariable lhs;
     pExprTree rhs;
@@ -33,9 +33,10 @@ public:
     virtual void maintain_vc(pExprTree &vc) override;
 };
 
-class Decrease
+class Decrease : public Action
 {
     std::vector<pExprTree> ranking;
 public:
     Decrease(std::vector<pExprTree> arg_ranking);
     virtual void maintain_vc(pExprTree &vc) override; // assert ranking function >= 0
+};
