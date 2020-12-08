@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+#include <string>
 #include "block.h"
 #include "ns.h"
 #include "action.h"
