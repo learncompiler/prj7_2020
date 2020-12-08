@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "action.h"
 #include "ns.h"
 
