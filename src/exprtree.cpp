@@ -6,7 +6,7 @@ z3::context& ExprContext::z3_context()
     return context;
 }
 
-z3::expr get_variable(std::string name)
+z3::expr ExprContext::get_variable(std::string name)
 {
     auto it = variable_pos.find(name);
     if (it != variable_pos.end())
@@ -14,18 +14,18 @@ z3::expr get_variable(std::string name)
         return variables[it->second];
     } else
     {
-        variables.push_back(context.bv_const(name, INT_WIDTH));
+        variables.push_back(context.bv_const(name.c_str(), INT_WIDTH));
         variable_pos[name] = variables.size() - 1;
         return *std::prev(variables.end());
     }
 }
 
-ValueType BoolExpr::value_type() const
+ExprTree::ValueType BoolExpr::value_type() const
 {
     return ExprTree::bool_type;
 }
 
-ValueType IntExpr::value_type() const
+ExprTree::ValueType IntExpr::value_type() const
 {
     return ExprTree::int_type;
 }
@@ -67,8 +67,8 @@ z3::expr BinaryLogic::z3_expr(ExprContext &ctx) const
     if (rhs->value_type() == ExprTree::int_type) r_expr = (r_expr != ctx.z3_context().bv_val(0, INT_WIDTH));
     switch(op)
     {
-        case and: return l_expr && r_expr;
-        case or : return l_expr || r_expr;
+        case and_logic: return l_expr && r_expr;
+        case or_logic : return l_expr || r_expr;
         case imply : return z3::implies(l_expr, r_expr);
     }
 }
@@ -145,7 +145,7 @@ pExprTree BinaryCmp::replace(pVariable v, pExprTree expr) const
 }
 pExprTree BinaryCmp::clone_tree() const
 {
-    return pExprTree(new BinaryCmp(op, lhs->clone_tree(), rhs->clone_tree()_));
+    return pExprTree(new BinaryCmp(op, lhs->clone_tree(), rhs->clone_tree()));
 }
 
 Unary::Unary(UnaryOp arg_op, pExprTree arg_child):
@@ -153,7 +153,7 @@ Unary::Unary(UnaryOp arg_op, pExprTree arg_child):
 ExprTree::ValueType Unary::value_type() const
 {
     if (op == neg) return ExprTree::int_type;
-    else if (op == logic_not) return Expr::bool_type;
+    else if (op == logic_not) return ExprTree::bool_type;
     else return child->value_type();
 }
 z3::expr Unary::z3_expr(ExprContext &ctx) const

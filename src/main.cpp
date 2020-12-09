@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "meverifLexer.h"
-#include "meverifParser.h"
-#include "CodeGenVisitor.h"
+#include "mdverifLexer.h"
+#include "mdverifParser.h"
+#include "verif_visitor.h"
 
 using namespace antlr4;
 using namespace std;
@@ -21,8 +21,6 @@ int main(int argc, const char* argv[]) {
     CommonTokenStream tokens(&lexer);
     mdverifParser parser(&tokens);
     parser.setErrorHandler(make_shared<BailErrorStrategy>());
-
-    // customized pass: allocator, typer, codegen and etc.
 
     mdverifParser::ProgramContext* root = parser.program();
     VerifVisitor visitor;

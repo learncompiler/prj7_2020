@@ -33,7 +33,7 @@ pVariable Namespace::new_var(string name)
 {
     if (vars.find(name) != vars.end())
         throw std::runtime_error("duplicate variable name " + name + " in " + to_string());
-    pVariable created_var = new Variable(to_string() + "::" + name, this);
+    pVariable created_var = pVariable(new Variable(to_string() + "::" + name, this));
     vars[name] = created_var;
     return created_var;
 }

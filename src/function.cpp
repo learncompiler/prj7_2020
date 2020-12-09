@@ -1,4 +1,6 @@
+#include <stdexcept>
 #include "function.h"
+#include "utils.h"
 
 Function::Function(std::string arg_name): name(arg_name)
 {

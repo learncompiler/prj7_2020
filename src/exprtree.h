@@ -36,7 +36,7 @@ public:
     // return newly created node
     // return nullptr for unmodified node
     // (cannot get origin shared_ptr and cannot create a new one)
-    virtual pExprTree clone_tree() = 0;
+    virtual pExprTree clone_tree() const = 0;
 };
 
 class BoolExpr : public ExprTree
