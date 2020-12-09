@@ -30,14 +30,18 @@ ValueType IntExpr::value_type() const
     return ExprTree::int_type;
 }
 
-Variable::Variable(std::string arg_name): name(arg_name) {}
+Variable::Variable(std::string arg_name, Namespace *arg_ns): name(arg_name), ns(arg_ns) {}
 z3::expr Variable::z3_expr(ExprContext &ctx) const
 {
     return ctx.get_variable(name);
 }
 pExprTree Variable::replace(pVariable v, pExprTree expr) const
 {
-    return v.get() == this ? expr : nullptr;
+    return (v->name == this->name && v->ns == this->ns) ? expr->clone_tree() : nullptr;
+}
+pExprTree Variable::clone_tree() const
+{
+    return pExprTree(new Variable(name, ns));
 }
 
 IntLiteral::IntLiteral(int32_t arg_value): value(arg_value) {}
@@ -48,6 +52,10 @@ z3::expr IntLiteral::z3_expr(ExprContext &ctx) const
 pExprTree IntLiteral::replace(pVariable v, pExprTree expr) const
 {
     return nullptr;
+}
+pExprTree IntLiteral::clone_tree() const
+{
+    return pExprTree(new IntLiteral(value));
 }
 
 BinaryLogic::BinaryLogic(BinaryLogicOp arg_op, pExprTree arg_lhs, pExprTree arg_rhs):
@@ -71,6 +79,10 @@ pExprTree BinaryLogic::replace(pVariable v, pExprTree expr) const
     if (!new_r) new_r = rhs;
     if (new_l != lhs || new_r != rhs) return pExprTree(new BinaryLogic(op, new_l, new_r));
     else return nullptr;
+}
+pExprTree BinaryLogic::clone_tree() const
+{
+    return pExprTree(new BinaryLogic(op, lhs->clone_tree(), rhs->clone_tree()));
 }
 
 BinaryArith::BinaryArith(BinaryArithOp arg_op, pExprTree arg_lhs, pExprTree arg_rhs):
@@ -99,6 +111,10 @@ pExprTree BinaryArith::replace(pVariable v, pExprTree expr) const
     if (new_l != lhs || new_r != rhs) return pExprTree(new BinaryArith(op, new_l, new_r));
     else return nullptr;
 }
+pExprTree BinaryArith::clone_tree() const
+{
+    return pExprTree(new BinaryArith(op, lhs->clone_tree(), rhs->clone_tree()));
+}
 
 BinaryCmp::BinaryCmp(BinaryCmpOp arg_op, pExprTree arg_lhs, pExprTree arg_rhs):
     op(arg_op), lhs(arg_lhs), rhs(arg_rhs) {}
@@ -126,6 +142,10 @@ pExprTree BinaryCmp::replace(pVariable v, pExprTree expr) const
     if (!new_r) new_r = rhs;
     if (new_l != lhs || new_r != rhs) return pExprTree(new BinaryCmp(op, new_l, new_r));
     else return nullptr;
+}
+pExprTree BinaryCmp::clone_tree() const
+{
+    return pExprTree(new BinaryCmp(op, lhs->clone_tree(), rhs->clone_tree()_));
 }
 
 Unary::Unary(UnaryOp arg_op, pExprTree arg_child):
@@ -161,4 +181,8 @@ pExprTree Unary::replace(pVariable v, pExprTree expr) const
     if (!new_child) new_child = child;
     if (new_child != child) return pExprTree(new Unary(op, child));
     else return nullptr;
+}
+pExprTree Unary::clone_tree() const
+{
+    return pExprTree(new Unary(op, child->clone_tree()));
 }
