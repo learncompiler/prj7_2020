@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(mdverif)
 
-add_compile_options(-lz3)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -g -Wall")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -Wall")
 
 find_package(Java)
 
@@ -44,7 +43,7 @@ file(GLOB src_dir
 )
 
 add_executable(mdverif ${src_dir})
-target_link_libraries(mdverif antlr4-cpp-runtime)
+target_link_libraries(mdverif antlr4-cpp-runtime libz3.so)
 
 # Add custom target update_antlr, use `make update_antlr` to update your lexer & grammar rules anytime
 add_custom_target(update_antlr
