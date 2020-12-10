@@ -83,14 +83,7 @@ antlrcpp::Any VerifVisitor::visitType(mdverifParser::TypeContext *ctx)
 antlrcpp::Any VerifVisitor::visitCompound_statement(mdverifParser::Compound_statementContext *ctx)
 {
     Log::debug << "VerifVisitor::visitCompound_statement\n";
-    Block *cur_block = cur_func->cur_block();
-    if(cur_block->terminate) return nullptr;
-    Namespace *cur_ns = cur_func->cur_ns();
-    cur_block->next = cur_func->new_block(cur_func->new_ns(cur_ns));
-    visitChildren(ctx);
-    Block *out_block = cur_func->cur_block();
-    if (!out_block->terminate) out_block->next = cur_func->new_block(cur_ns);
-    return nullptr;
+    return visitChildren(ctx);
 }
 
 antlrcpp::Any VerifVisitor::visitBlock_item(mdverifParser::Block_itemContext *ctx)
@@ -126,7 +119,14 @@ antlrcpp::Any VerifVisitor::visitStmt3(mdverifParser::Stmt3Context *ctx)
 antlrcpp::Any VerifVisitor::visitStmt4(mdverifParser::Stmt4Context *ctx)
 {
     Log::debug << "VerifVisitor::visitStmt4\n";
-    return visitChildren(ctx);
+    Block *cur_block = cur_func->cur_block();
+    if(cur_block->terminate) return nullptr;
+    Namespace *cur_ns = cur_func->cur_ns();
+    cur_block->next = cur_func->new_block(cur_func->new_ns(cur_ns));
+    visitChildren(ctx);
+    Block *out_block = cur_func->cur_block();
+    if (!out_block->terminate) out_block->next = cur_func->new_block(cur_ns);
+    return nullptr;
 }
 
 antlrcpp::Any VerifVisitor::visitDeclaration(mdverifParser::DeclarationContext *ctx)
@@ -153,7 +153,7 @@ antlrcpp::Any VerifVisitor::visitAssignment(mdverifParser::AssignmentContext *ct
         throw SyntaxError("cannot assign to " + result_name);
     pVariable lhs = cur_func->cur_ns()->recursive_resolve(ctx->Identifier()->getText());
     if (!lhs) throw SyntaxError("cannot find variable " + ctx->Identifier()->getText());
-    if (lhs->get_ns() == cur_func->root_ns())
+    if (cur_func->get_params_set().find(lhs) != cur_func->get_params_set().end())
         throw SyntaxError("forbid assignment to parameter");
     if (cur_func->cur_block()->terminate) return nullptr;
     cur_func->add_action(new Assign(lhs, ctx->expression()->accept(this)));
