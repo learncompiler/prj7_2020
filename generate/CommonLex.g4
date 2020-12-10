@@ -52,6 +52,6 @@ Identifier
     : [a-zA-Z_][a-zA-Z_0-9]*
     ;
 
-WS : 
-    [ \t\r\n] -> skip
-    ;
+LINE_COMMENT : '//' .*? '\r'? '\n' -> skip;
+
+WS : [ \t\r\n] -> skip;
