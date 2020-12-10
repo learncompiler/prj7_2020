@@ -64,6 +64,7 @@ public:
     virtual pExprTree replace(pVariable v, pExprTree expr) const override;
     virtual pExprTree clone_tree() const override;
     virtual void to_string(std::ostringstream &ss) const override;
+    Namespace* get_ns() const;
     friend class Namespace;
 };
 

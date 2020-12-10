@@ -1,5 +1,6 @@
 #include <utility>
 #include "action.h"
+#include "utils.h"
 
 Assume::Assume(pExprTree arg_expr): expr(arg_expr) {}
 void Assume::maintain_vc(pExprTree &vc)
@@ -28,7 +29,7 @@ void Assign::maintain_vc(pExprTree &vc)
 Decrease::Decrease(std::vector<pExprTree> arg_ranking):
     ranking(std::move(arg_ranking))
 {
-    for (pExprTree i : ranking) if (i->value_type() != ExprTree:int_type)
+    for (pExprTree i : ranking) if (i->value_type() != ExprTree::int_type)
         throw SyntaxError("ranking function should be int.");
 }
 void Decrease::maintain_vc(pExprTree &vc)

@@ -1,5 +1,6 @@
 #include "exprtree.h"
 #include "utils.h"
+#include "ns.h"
 
 z3::context& ExprContext::z3_context()
 {
@@ -46,6 +47,10 @@ pExprTree Variable::clone_tree() const
 void Variable::to_string(std::ostringstream &ss) const
 {
     ss << name;
+}
+Namespace* Variable::get_ns() const
+{
+    return ns;
 }
 
 IntLiteral::IntLiteral(int32_t arg_value): value(arg_value) {}
