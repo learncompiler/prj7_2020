@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <sstream>
 #include <cstdint>
 #include <z3++.h>
 
@@ -37,6 +38,7 @@ public:
     // return nullptr for unmodified node
     // (cannot get origin shared_ptr and cannot create a new one)
     virtual pExprTree clone_tree() const = 0;
+    virtual void to_string(std::ostringstream &ss) const = 0;
 };
 
 class BoolExpr : public ExprTree
@@ -61,6 +63,7 @@ public:
     virtual z3::expr z3_expr(ExprContext &ctx) const override;
     virtual pExprTree replace(pVariable v, pExprTree expr) const override;
     virtual pExprTree clone_tree() const override;
+    virtual void to_string(std::ostringstream &ss) const override;
     friend class Namespace;
 };
 
@@ -72,6 +75,7 @@ public:
     virtual z3::expr z3_expr(ExprContext &ctx) const override;
     virtual pExprTree replace(pVariable v, pExprTree expr) const override;
     virtual pExprTree clone_tree() const override;
+    virtual void to_string(std::ostringstream &ss) const override;
 };
 
 class BinaryLogic : public BoolExpr // (bool, bool) -> bool
@@ -91,6 +95,7 @@ public:
     virtual z3::expr z3_expr(ExprContext &ctx) const override;
     virtual pExprTree replace(pVariable v, pExprTree expr) const override;
     virtual pExprTree clone_tree() const override;
+    virtual void to_string(std::ostringstream &ss) const override;
 };
 
 class BinaryArith : public IntExpr // (int, int) -> int
@@ -112,6 +117,7 @@ public:
     virtual z3::expr z3_expr(ExprContext &ctx) const override;
     virtual pExprTree replace(pVariable v, pExprTree expr) const override;
     virtual pExprTree clone_tree() const override;
+    virtual void to_string(std::ostringstream &ss) const override;
 };
 
 class BinaryCmp : public BoolExpr // (int, int) -> bool
@@ -134,6 +140,7 @@ public:
     virtual z3::expr z3_expr(ExprContext &ctx) const override;
     virtual pExprTree replace(pVariable v, pExprTree expr) const override;
     virtual pExprTree clone_tree() const override;
+    virtual void to_string(std::ostringstream &ss) const override;
 };
 
 class Unary : public ExprTree
@@ -154,4 +161,5 @@ public:
     virtual z3::expr z3_expr(ExprContext &ctx) const override;
     virtual pExprTree replace(pVariable v, pExprTree expr) const override;
     virtual pExprTree clone_tree() const override;
+    virtual void to_string(std::ostringstream &ss) const override;
 };

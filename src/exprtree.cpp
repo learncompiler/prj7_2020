@@ -43,6 +43,10 @@ pExprTree Variable::clone_tree() const
 {
     return pExprTree(new Variable(name, ns));
 }
+void Variable::to_string(std::ostringstream &ss) const
+{
+    ss << name;
+}
 
 IntLiteral::IntLiteral(int32_t arg_value): value(arg_value) {}
 z3::expr IntLiteral::z3_expr(ExprContext &ctx) const
@@ -56,6 +60,10 @@ pExprTree IntLiteral::replace(pVariable v, pExprTree expr) const
 pExprTree IntLiteral::clone_tree() const
 {
     return pExprTree(new IntLiteral(value));
+}
+void IntLiteral::to_string(std::ostringstream &ss) const
+{
+    ss << value;
 }
 
 BinaryLogic::BinaryLogic(BinaryLogicOp arg_op, pExprTree arg_lhs, pExprTree arg_rhs):
@@ -83,6 +91,21 @@ pExprTree BinaryLogic::replace(pVariable v, pExprTree expr) const
 pExprTree BinaryLogic::clone_tree() const
 {
     return pExprTree(new BinaryLogic(op, lhs->clone_tree(), rhs->clone_tree()));
+}
+void BinaryLogic::to_string(std::ostringstream &ss) const
+{
+    ss << '(';
+    lhs->to_string(ss);
+    ss << ") ";
+    switch(op)
+    {
+        case and_logic: ss << "&&"; break;
+        case or_logic : ss << "||"; break;
+        case imply : ss << "-->"; break;
+    }
+    ss << " (";
+    rhs->to_string(ss);
+    ss << ')';
 }
 
 BinaryArith::BinaryArith(BinaryArithOp arg_op, pExprTree arg_lhs, pExprTree arg_rhs):
@@ -115,6 +138,23 @@ pExprTree BinaryArith::clone_tree() const
 {
     return pExprTree(new BinaryArith(op, lhs->clone_tree(), rhs->clone_tree()));
 }
+void BinaryArith::to_string(std::ostringstream &ss) const
+{
+    ss << '(';
+    lhs->to_string(ss);
+    ss << ") ";
+    switch(op)
+    {
+        case add: ss << '+'; break;
+        case minus : ss << '-'; break;
+        case mul : ss << '*'; break;
+        case div : ss << '/'; break;
+        case mod : ss << '%'; break;
+    }
+    ss << " (";
+    rhs->to_string(ss);
+    ss << ')';
+}
 
 BinaryCmp::BinaryCmp(BinaryCmpOp arg_op, pExprTree arg_lhs, pExprTree arg_rhs):
     op(arg_op), lhs(arg_lhs), rhs(arg_rhs) {}
@@ -146,6 +186,24 @@ pExprTree BinaryCmp::replace(pVariable v, pExprTree expr) const
 pExprTree BinaryCmp::clone_tree() const
 {
     return pExprTree(new BinaryCmp(op, lhs->clone_tree(), rhs->clone_tree()));
+}
+void BinaryCmp::to_string(std::ostringstream &ss) const
+{
+    ss << '(';
+    lhs->to_string(ss);
+    ss << ") ";
+    switch(op)
+    {
+        case eq: ss << "=="; break;
+        case neq : ss << "!="; break;
+        case le : ss << "<="; break;
+        case lt : ss << '<'; break;
+        case ge : ss << ">="; break;
+        case gt : ss << '>'; break;
+    }
+    ss << " (";
+    rhs->to_string(ss);
+    ss << ')';
 }
 
 Unary::Unary(UnaryOp arg_op, pExprTree arg_child):
@@ -185,4 +243,16 @@ pExprTree Unary::replace(pVariable v, pExprTree expr) const
 pExprTree Unary::clone_tree() const
 {
     return pExprTree(new Unary(op, child->clone_tree()));
+}
+void Unary::to_string(std::ostringstream &ss) const
+{
+    switch(op)
+    {
+        case neg : ss << '-'; break;
+        case bitwise_not : ss << '~'; break;
+        case logic_not : ss << '!'; break;
+    }
+    ss << " (";
+    child->to_string(ss);
+    ss << ')';
 }
