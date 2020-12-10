@@ -1,5 +1,5 @@
 #pragma once
-#define CUSTOM_LOG_LEVEL 2
+#define CUSTOM_LOG_LEVEL 1
 
 #include <type_traits>
 #include <ostream>
