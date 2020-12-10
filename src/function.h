@@ -13,6 +13,7 @@ class Function
     std::vector<Namespace*> namespaces;
     std::vector<Block*> blocks;
     std::vector<pExprTree> precond, postcond;
+    std::vector<pVariable> params;
 public:
     Function(const Function &y) = delete;
     Function& operator=(const Function &y) = delete;
@@ -27,6 +28,9 @@ public:
     void verify();
     void add_precond(pExprTree cond);
     void add_postcond(pExprTree cond);
+    void add_param(pVariable param_v);
     const std::vector<pExprTree>& get_precond();
     const std::vector<pExprTree>& get_postcond();
+    const std::vector<pVariable>& get_params();
+    Namespace* root_ns();
 };

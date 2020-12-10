@@ -65,6 +65,11 @@ void Function::add_postcond(pExprTree cond)
     postcond.push_back(cond);
 }
 
+void Function::add_param(pVariable param_v)
+{
+    params.push_back(param_v);
+}
+
 const std::vector<pExprTree>& Function::get_precond()
 {
     return precond;
@@ -73,4 +78,14 @@ const std::vector<pExprTree>& Function::get_precond()
 const std::vector<pExprTree>& Function::get_postcond()
 {
     return postcond;
+}
+
+const std::vector<pVariable>& Function::get_params()
+{
+    return params;
+}
+
+Namespace* Function::root_ns()
+{
+    return *namespaces.begin();
 }
