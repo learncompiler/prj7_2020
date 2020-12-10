@@ -20,6 +20,8 @@ public:
     virtual antlrcpp::Any visitProgram(mdverifParser::ProgramContext *ctx) override;
 
     virtual antlrcpp::Any visitFunction(mdverifParser::FunctionContext *ctx) override;
+    
+    virtual antlrcpp::Any visitParameter_list(mdverifParser::Parameter_listContext *ctx) override;
 
     virtual antlrcpp::Any visitCondition(mdverifParser::ConditionContext *ctx) override;
 

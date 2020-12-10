@@ -26,7 +26,7 @@ antlrcpp::Any VerifVisitor::visitFunction(mdverifParser::FunctionContext *ctx)
 {
     Log::debug << "VerifVisitor::visitFunction\n";
     cur_func = new Function(ctx->Identifier()->getText());
-    // add function arguments to root ns
+    ctx->parameter_list()->accept(this);
     cur_func->cur_ns()->new_var(result_name);
     for (mdverifParser::ConditionContext *i : ctx->condition()) i->accept(this);
     for (pExprTree i : cur_func->get_precond())
@@ -39,6 +39,14 @@ antlrcpp::Any VerifVisitor::visitFunction(mdverifParser::FunctionContext *ctx)
     cur_func->verify();
     delete cur_func;
     cur_func = nullptr;
+    return nullptr;
+}
+
+antlrcpp::Any VerifVisitor::visitParameter_list(mdverifParser::Parameter_listContext *ctx)
+{
+    Log::debug << "VerifVisitor::visitParameter_list\n";
+    for (auto i : ctx->Identifier())
+        cur_func->add_param(cur_func->cur_ns()->new_var(i->getText()));
     return nullptr;
 }
 
@@ -124,9 +132,17 @@ antlrcpp::Any VerifVisitor::visitStmt4(mdverifParser::Stmt4Context *ctx)
 antlrcpp::Any VerifVisitor::visitDeclaration(mdverifParser::DeclarationContext *ctx)
 {
     Log::debug << "VerifVisitor::visitDeclaration\n";
-    Log::error << "not implemented\n";
-    // TODO
-    // variable name cannot be result_name
+    if (cur_func->cur_block()->terminate) return nullptr;
+    pExprTree init_value;
+    if (ctx->expression()) init_value = ctx->expression()->accept(this);
+    std::string cur_name = ctx->Identifier()->getText();
+    if (cur_name == result_name)
+        throw SyntaxError("variable defination named " + result_name + "is forbidden");
+    if (cur_func->cur_ns()->resolve(cur_name))
+        throw SyntaxError("duplicate variable name " + cur_name);
+    pVariable defined_var = cur_func->cur_ns()->new_var(cur_name);
+    if (init_value)
+        cur_func->add_action(new Assign(defined_var, init_value));
     return nullptr;
 }
 
@@ -137,6 +153,8 @@ antlrcpp::Any VerifVisitor::visitAssignment(mdverifParser::AssignmentContext *ct
         throw SyntaxError("cannot assign to " + result_name);
     pVariable lhs = cur_func->cur_ns()->recursive_resolve(ctx->Identifier()->getText());
     if (!lhs) throw SyntaxError("cannot find variable " + ctx->Identifier()->getText());
+    if (lhs->get_ns() == cur_func->root_ns())
+        throw SyntaxError("forbid assignment to parameter");
     if (cur_func->cur_block()->terminate) return nullptr;
     cur_func->add_action(new Assign(lhs, ctx->expression()->accept(this)));
     return nullptr;
