@@ -1,9 +1,9 @@
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <cstdint>
 #include "verif_visitor.h"
 #include "log.h"
+#include "utils.h"
 
 static const std::string result_name = "result";
 
@@ -134,9 +134,9 @@ antlrcpp::Any VerifVisitor::visitAssignment(mdverifParser::AssignmentContext *ct
 {
     Log::debug << "VerifVisitor::visitAssignment\n";
     if (ctx->Identifier()->getText() == result_name)
-        throw std::runtime_error("cannot assign to " + result_name);
+        throw SyntaxError("cannot assign to " + result_name);
     pVariable lhs = cur_func->cur_ns()->recursive_resolve(ctx->Identifier()->getText());
-    if (!lhs) throw std::runtime_error("cannot find variable " + ctx->Identifier()->getText());
+    if (!lhs) throw SyntaxError("cannot find variable " + ctx->Identifier()->getText());
     if (cur_func->cur_block()->terminate) return nullptr;
     cur_func->add_action(new Assign(lhs, ctx->expression()->accept(this)));
     return nullptr;
@@ -260,7 +260,7 @@ antlrcpp::Any VerifVisitor::visitUnary2(mdverifParser::Unary2Context *ctx)
 {
     Log::debug << "VerifVisitor::visitUnary2\n";
     pExprTree expr = ctx->children[1]->accept(this);
-    std::string op_s = ctx->children[0]->accept(this);
+    std::string op_s = ctx->children[0]->getText();
     Unary::UnaryOp op = op_s == "-" ? Unary::neg :
                         op_s == "~" ? Unary::bitwise_not :
                         Unary::logic_not;
@@ -274,7 +274,7 @@ static int32_t parse_int32(const std::string &s)
     for (char ch : s)
     {
         res = res * 10 + ch - '0';
-        if (res > MAX) throw std::runtime_error("integer literal out of range");
+        if (res > MAX) throw SyntaxError("integer literal out of range");
     }
     return static_cast<int32_t>(res);
 }
@@ -296,8 +296,8 @@ antlrcpp::Any VerifVisitor::visitPrimary3(mdverifParser::Primary3Context *ctx)
 {
     Log::debug << "VerifVisitor::visitPrimary3\n";
     if (ctx->Identifier()->getText() == result_name && cur_state != post)
-        throw std::runtime_error("illegal reference to " + result_name);
+        throw SyntaxError("illegal reference to " + result_name);
     pVariable v = cur_func->cur_ns()->recursive_resolve(ctx->Identifier()->getText());
-    if (!v) throw std::runtime_error("cannot find variable " + ctx->Identifier()->getText());
+    if (!v) throw SyntaxError("cannot find variable " + ctx->Identifier()->getText());
     return v->clone_tree();
 }
