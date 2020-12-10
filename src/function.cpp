@@ -52,7 +52,7 @@ void Function::verify()
         for (Action *action : block->actions)
             basic_path.push_back(action);
     if (!verify_basic_path(basic_path))
-        std::runtime_error("Verification failed in a basic path in function " + name);
+        throw VerificationError("Verification failed in a basic path in function " + name);
 }
 
 void Function::add_precond(pExprTree cond)
