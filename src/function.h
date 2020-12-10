@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <set>
 #include "block.h"
 #include "ns.h"
 #include "action.h"
@@ -14,6 +15,7 @@ class Function
     std::vector<Block*> blocks;
     std::vector<pExprTree> precond, postcond;
     std::vector<pVariable> params;
+    std::set<pVariable> params_set;
 public:
     Function(const Function &y) = delete;
     Function& operator=(const Function &y) = delete;
@@ -32,5 +34,6 @@ public:
     const std::vector<pExprTree>& get_precond();
     const std::vector<pExprTree>& get_postcond();
     const std::vector<pVariable>& get_params();
+    const std::set<pVariable>& get_params_set();
     Namespace* root_ns();
 };
