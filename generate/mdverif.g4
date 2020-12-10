@@ -5,7 +5,11 @@ import CommonLex;
 program : function* EOF;
 
 function
-    : type Identifier '(' ')' condition* compound_statement
+    : type Identifier '(' parameter_list ')' condition* compound_statement
+    ;
+
+parameter_list
+    : (type Identifier (',' type Identifier)*)?
     ;
 
 condition : precondition | postcondition;
