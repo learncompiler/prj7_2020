@@ -43,6 +43,8 @@ public:
 
     virtual antlrcpp::Any visitStmt4(mdverifParser::Stmt4Context *ctx) override;
 
+    virtual antlrcpp::Any visitStmt5(mdverifParser::Stmt5Context *ctx) override;
+
     virtual antlrcpp::Any visitDeclaration(mdverifParser::DeclarationContext *ctx) override;
 
     virtual antlrcpp::Any visitAssignment(mdverifParser::AssignmentContext *ctx) override;

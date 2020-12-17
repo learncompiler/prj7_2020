@@ -44,15 +44,33 @@ void Function::add_action(Action *action)
     cur_block()->actions.push_back(action);
 }
 
+static void dfs(Block *cur, std::vector<Action*> &path, std::string func_name)
+{
+    for (Action *action : cur->actions)
+        path.push_back(action);
+    if (cur->terminate)
+    {
+        if (!verify_basic_path(path))
+            throw VerificationError("Verification failed in a basic path in function " + func_name);
+    } else if (cur->conditional)
+    {
+        size_t old_size = path.size();
+        Action *assume1 = new Assume(cur->condition);
+        path.push_back(assume1);
+        dfs(cur->next, path, func_name);
+        path.erase(path.begin() + old_size, path.end());
+        delete assume1;
+        Action *assume2 = new Assume(pExprTree(new Unary(Unary::logic_not, cur->condition)));
+        path.push_back(assume2);
+        dfs(cur->alter, path, func_name);
+        path.erase(path.begin() + old_size, path.end());
+        delete assume2;
+    } else dfs(cur->next, path, func_name);
+}
 void Function::verify()
 {
-    // TODO: dfs to generate basic path
-    std::vector<Action*> basic_path;
-    for (Block *block : blocks)
-        for (Action *action : block->actions)
-            basic_path.push_back(action);
-    if (!verify_basic_path(basic_path))
-        throw VerificationError("Verification failed in a basic path in function " + name);
+    std::vector<Action*> tmp;
+    dfs(blocks[0], tmp, name);
 }
 
 void Function::add_precond(pExprTree cond)

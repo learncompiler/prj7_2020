@@ -34,8 +34,11 @@ antlrcpp::Any VerifVisitor::visitFunction(mdverifParser::FunctionContext *ctx)
     cur_state = normal;
     ctx->compound_statement()->accept(this);
     if (!cur_func->cur_block()->terminate)
+    {
         for (pExprTree i : cur_func->get_postcond())
             cur_func->add_action(new Assert(i));
+        cur_func->cur_block()->terminate = true;
+    }
     cur_func->verify();
     delete cur_func;
     cur_func = nullptr;
@@ -121,11 +124,42 @@ antlrcpp::Any VerifVisitor::visitStmt4(mdverifParser::Stmt4Context *ctx)
     Log::debug << "VerifVisitor::visitStmt4\n";
     Block *cur_block = cur_func->cur_block();
     if(cur_block->terminate) return nullptr;
-    Namespace *cur_ns = cur_func->cur_ns();
+    Namespace *cur_ns = cur_block->ns;
     cur_block->next = cur_func->new_block(cur_func->new_ns(cur_ns));
     visitChildren(ctx);
     Block *out_block = cur_func->cur_block();
     if (!out_block->terminate) out_block->next = cur_func->new_block(cur_ns);
+    return nullptr;
+}
+
+antlrcpp::Any VerifVisitor::visitStmt5(mdverifParser::Stmt5Context *ctx)
+{
+    Log::debug << "VerifVisitor::visitStmt5\n";
+    Block *prev_block = cur_func->cur_block();
+    if(prev_block->terminate) return nullptr;
+    Namespace *prev_ns = prev_block->ns;
+    prev_block->conditional = true;
+    prev_block->condition = ctx->expression()->accept(this);
+    prev_block->next = cur_func->new_block(cur_func->new_ns(prev_ns));
+    ctx->statement(0)->accept(this);
+    Block *first = cur_func->cur_block();
+    if (ctx->statement(1))
+    {
+        prev_block->alter = cur_func->new_block(cur_func->new_ns(prev_ns));
+        ctx->statement(1)->accept(this);
+        Block *second = cur_func->cur_block();
+        if ((!first->terminate) || (!second->terminate))
+        {
+            Block *out = cur_func->new_block(prev_ns);
+            if (!first->terminate) first->next = out;
+            if (!second->terminate) second->next = out;
+        }
+    } else
+    {
+        Block *out = cur_func->new_block(prev_ns);
+        prev_block->alter = out;
+        if (!first->terminate) first->next = out;
+    }
     return nullptr;
 }
 
