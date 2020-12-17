@@ -36,6 +36,7 @@ statement
     | assignment ';' # stmt2
     | ';' # stmt3
     | compound_statement # stmt4
+    | 'if' '(' expression ')' statement ('else' statement)? # stmt5
     ;
 
 declaration
