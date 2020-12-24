@@ -37,7 +37,16 @@ statement
     | ';' # stmt3
     | compound_statement # stmt4
     | 'if' '(' expression ')' statement ('else' statement)? # stmt5
+    | 'while' '(' expression ')' loop_spec* statement # stmt6
     ;
+
+loop_spec
+    : loop_invariant
+    | ranking_function
+    ;
+
+loop_invariant : 'invariant' expression;
+ranking_function : 'decrease' '(' expression (',' expression)* ')';
 
 declaration
     : type Identifier ('=' expression)? ';'

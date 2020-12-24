@@ -12,6 +12,8 @@ Break : 'break';
 Continue : 'continue';
 Requires : 'requires';
 Ensures : 'ensures';
+Invariant : 'invariant';
+Decrease : 'decrease';
 
 // operator
 Lparen : '(' ;
