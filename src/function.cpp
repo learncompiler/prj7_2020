@@ -6,7 +6,9 @@ Function::Function(std::string arg_name): name(arg_name)
 {
     Namespace *root_ns = new Namespace(nullptr);
     namespaces.push_back(root_ns);
-    blocks.push_back(new Block(root_ns));
+    Block *in = new Block(root_ns);
+    blocks.push_back(in);
+    starting_blocks.push_back(in);
 }
 
 Function::~Function()
@@ -69,8 +71,11 @@ static void dfs(Block *cur, std::vector<Action*> &path, std::string func_name)
 }
 void Function::verify()
 {
-    std::vector<Action*> tmp;
-    dfs(blocks[0], tmp, name);
+    for (Block *i : starting_blocks)
+    {
+        std::vector<Action*> tmp;
+        dfs(i, tmp, name);
+    }
 }
 
 void Function::add_precond(pExprTree cond)
@@ -87,6 +92,11 @@ void Function::add_param(pVariable param_v)
 {
     params.push_back(param_v);
     params_set.insert(param_v);
+}
+
+void Function::add_starting_block(Block *block)
+{
+    starting_blocks.push_back(block);
 }
 
 const std::vector<pExprTree>& Function::get_precond()

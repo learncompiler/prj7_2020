@@ -39,3 +39,7 @@ void Decrease::maintain_vc(pExprTree &vc)
         if (vc) vc = pExprTree(new BinaryLogic(BinaryLogic::and_logic, vc, pExprTree(new BinaryCmp(BinaryCmp::ge, ranking_f, zero))));
         else vc = pExprTree(new BinaryCmp(BinaryCmp::ge, ranking_f, zero));
 }
+const std::vector<pExprTree>& Decrease::rank_function()
+{
+    return ranking;
+}

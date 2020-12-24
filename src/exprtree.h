@@ -39,6 +39,7 @@ public:
     // (cannot get origin shared_ptr and cannot create a new one)
     virtual pExprTree clone_tree() const = 0;
     virtual void to_string(std::ostringstream &ss) const = 0;
+    virtual ~ExprTree() = default;
 };
 
 class BoolExpr : public ExprTree

@@ -13,6 +13,7 @@ class Function
     std::string name;
     std::vector<Namespace*> namespaces;
     std::vector<Block*> blocks;
+    std::vector<Block*> starting_blocks;
     std::vector<pExprTree> precond, postcond;
     std::vector<pVariable> params;
     std::set<pVariable> params_set;
@@ -31,6 +32,7 @@ public:
     void add_precond(pExprTree cond);
     void add_postcond(pExprTree cond);
     void add_param(pVariable param_v);
+    void add_starting_block(Block *block);
     const std::vector<pExprTree>& get_precond();
     const std::vector<pExprTree>& get_postcond();
     const std::vector<pVariable>& get_params();

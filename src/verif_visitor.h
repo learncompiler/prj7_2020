@@ -45,6 +45,14 @@ public:
 
     virtual antlrcpp::Any visitStmt5(mdverifParser::Stmt5Context *ctx) override;
 
+    virtual antlrcpp::Any visitStmt6(mdverifParser::Stmt6Context *ctx) override;
+
+    virtual antlrcpp::Any visitLoop_spec(mdverifParser::Loop_specContext *ctx) override;
+
+    virtual antlrcpp::Any visitLoop_invariant(mdverifParser::Loop_invariantContext *ctx) override;
+
+    virtual antlrcpp::Any visitRanking_function(mdverifParser::Ranking_functionContext *ctx) override;
+
     virtual antlrcpp::Any visitDeclaration(mdverifParser::DeclarationContext *ctx) override;
 
     virtual antlrcpp::Any visitAssignment(mdverifParser::AssignmentContext *ctx) override;

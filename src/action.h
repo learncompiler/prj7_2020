@@ -6,6 +6,7 @@ class Action
 {
 public:
     virtual void maintain_vc(pExprTree &vc) = 0;
+    virtual ~Action() = default;
 };
 
 class Assume : public Action
@@ -39,4 +40,5 @@ class Decrease : public Action
 public:
     Decrease(std::vector<pExprTree> arg_ranking);
     virtual void maintain_vc(pExprTree &vc) override; // assert ranking function >= 0
+    const std::vector<pExprTree>& rank_function();
 };
