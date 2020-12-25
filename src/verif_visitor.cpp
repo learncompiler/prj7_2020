@@ -187,6 +187,50 @@ antlrcpp::Any VerifVisitor::visitStmt6(mdverifParser::Stmt6Context *ctx)
     return nullptr;
 }
 
+antlrcpp::Any VerifVisitor::visitStmt7(mdverifParser::Stmt7Context *ctx)
+{
+    Log::debug << "VerifVisitor::visitStmt7\n";
+    pExprTree loop_cond = ctx->expression()->accept(this);
+    std::vector<pExprTree> invariants;
+    std::vector<std::vector<pExprTree>> rank_functions;
+    for (mdverifParser::Loop_specContext *i : ctx->loop_spec())
+    {
+        antlrcpp::Any invar_or_rank = i->accept(this);
+        if (invar_or_rank.is<pExprTree>()) invariants.push_back(invar_or_rank);
+        else rank_functions.push_back(invar_or_rank);
+    }
+    gen_loop([ctx, this]()->void {ctx->assignment(0)->accept(this);},
+        loop_cond,
+        [ctx, this]()->void {ctx->statement()->accept(this);},
+        [ctx, this]()->void {ctx->assignment(1)->accept(this);},
+        invariants,
+        rank_functions
+    );
+    return nullptr;
+}
+
+antlrcpp::Any VerifVisitor::visitStmt8(mdverifParser::Stmt8Context *ctx)
+{
+    Log::debug << "VerifVisitor::visitStmt8\n";
+    pExprTree loop_cond = ctx->expression()->accept(this);
+    std::vector<pExprTree> invariants;
+    std::vector<std::vector<pExprTree>> rank_functions;
+    for (mdverifParser::Loop_specContext *i : ctx->loop_spec())
+    {
+        antlrcpp::Any invar_or_rank = i->accept(this);
+        if (invar_or_rank.is<pExprTree>()) invariants.push_back(invar_or_rank);
+        else rank_functions.push_back(invar_or_rank);
+    }
+    gen_loop([ctx, this]()->void {ctx->declaration()->accept(this);},
+        loop_cond,
+        [ctx, this]()->void {ctx->statement()->accept(this);},
+        [ctx, this]()->void {ctx->assignment()->accept(this);},
+        invariants,
+        rank_functions
+    );
+    return nullptr;
+}
+
 antlrcpp::Any VerifVisitor::visitLoop_spec(mdverifParser::Loop_specContext *ctx)
 {
     Log::debug << "VerifVisitor::visitLoop_spec\n";

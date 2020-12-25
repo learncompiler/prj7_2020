@@ -48,6 +48,10 @@ public:
 
     virtual antlrcpp::Any visitStmt6(mdverifParser::Stmt6Context *ctx) override;
 
+    virtual antlrcpp::Any visitStmt7(mdverifParser::Stmt7Context *ctx) override;
+
+    virtual antlrcpp::Any visitStmt8(mdverifParser::Stmt8Context *ctx) override;
+
     virtual antlrcpp::Any visitLoop_spec(mdverifParser::Loop_specContext *ctx) override;
 
     virtual antlrcpp::Any visitLoop_invariant(mdverifParser::Loop_invariantContext *ctx) override;

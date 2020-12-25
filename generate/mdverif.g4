@@ -38,6 +38,8 @@ statement
     | compound_statement # stmt4
     | 'if' '(' expression ')' statement ('else' statement)? # stmt5
     | 'while' '(' expression ')' loop_spec* statement # stmt6
+    | 'for' '(' assignment ';' expression ';' assignment ')' loop_spec* statement # stmt7
+    | 'for' '(' declaration expression ';' assignment ')' loop_spec* statement # stmt8
     ;
 
 loop_spec
