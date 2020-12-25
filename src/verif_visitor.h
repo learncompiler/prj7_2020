@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include "mdverifBaseVisitor.h"
 #include "function.h"
 
@@ -96,4 +97,8 @@ public:
     virtual antlrcpp::Any visitPrimary2(mdverifParser::Primary2Context *ctx) override;
 
     virtual antlrcpp::Any visitPrimary3(mdverifParser::Primary3Context *ctx) override;
+    
+private:
+    void gen_loop(std::function<void()> pre, pExprTree cond, std::function<void()> body, std::function<void()> post,
+        std::vector<pExprTree> invariants, std::vector<std::vector<pExprTree>> rank_f);
 };

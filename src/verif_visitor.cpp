@@ -177,34 +177,13 @@ antlrcpp::Any VerifVisitor::visitStmt6(mdverifParser::Stmt6Context *ctx)
         if (invar_or_rank.is<pExprTree>()) invariants.push_back(invar_or_rank);
         else rank_functions.push_back(invar_or_rank);
     }
-    Block *prev_block = cur_func->cur_block();
-    Namespace *prev_ns = cur_func->cur_ns();
-    if (prev_block->terminate) return nullptr;
-    for (pExprTree i : invariants)
-        prev_block->actions.push_back(new Assert(i));
-    for (auto &i : rank_functions)
-        prev_block->actions.push_back(new Decrease(i));
-    prev_block->terminate = true;
-    Block *loop_start = cur_func->new_block(cur_func->cur_ns());
-    cur_func->add_starting_block(loop_start);
-    for (pExprTree i : invariants)
-        loop_start->actions.push_back(new Assume(i));
-    for (auto &i : rank_functions)
-        loop_start->actions.push_back(new Decrease(i));
-    loop_start->conditional = true;
-    loop_start->condition = loop_cond;
-    loop_start->next = cur_func->new_block(cur_func->new_ns(prev_ns));
-    ctx->statement()->accept(this);
-    Block *loop_end = cur_func->cur_block();
-    if (!loop_end->terminate)
-    {
-        for (pExprTree i : invariants)
-            loop_end->actions.push_back(new Assert(i));
-        for (auto &i : rank_functions)
-            loop_end->actions.push_back(new Decrease(i));
-        loop_end->terminate = true;
-    }
-    loop_start->alter = cur_func->new_block(prev_ns);
+    gen_loop([]()->void {},
+        loop_cond,
+        [ctx, this]()->void {ctx->statement()->accept(this);},
+        []()->void {},
+        invariants,
+        rank_functions
+    );
     return nullptr;
 }
 
@@ -418,4 +397,42 @@ antlrcpp::Any VerifVisitor::visitPrimary3(mdverifParser::Primary3Context *ctx)
     pVariable v = cur_func->cur_ns()->recursive_resolve(ctx->Identifier()->getText());
     if (!v) throw SyntaxError("cannot find variable " + ctx->Identifier()->getText());
     return v->clone_tree();
+}
+
+void VerifVisitor::gen_loop(std::function<void()> pre, pExprTree cond, std::function<void()> body, std::function<void()> post,
+        std::vector<pExprTree> invariants, std::vector<std::vector<pExprTree>> rank_f)
+{
+    Block *prev_block = cur_func->cur_block();
+    Namespace *prev_ns = cur_func->cur_ns();
+    if (prev_block->terminate) return;
+    prev_block->next = cur_func->new_block(cur_func->new_ns(prev_ns));
+    Namespace *in_ns = cur_func->cur_ns();
+    Block *in_block = cur_func->cur_block();
+    pre();
+    for (pExprTree i : invariants)
+        in_block->actions.push_back(new Assert(i));
+    for (auto &i : rank_f)
+        in_block->actions.push_back(new Decrease(i));
+    in_block->terminate = true;
+    Block *loop_start = cur_func->new_block(cur_func->cur_ns());
+    cur_func->add_starting_block(loop_start);
+    for (pExprTree i : invariants)
+        loop_start->actions.push_back(new Assume(i));
+    for (auto &i : rank_f)
+        loop_start->actions.push_back(new Decrease(i));
+    loop_start->conditional = true;
+    loop_start->condition = cond;
+    loop_start->next = cur_func->new_block(cur_func->new_ns(in_ns));
+    body();
+    post();
+    Block *loop_end = cur_func->cur_block();
+    if (!loop_end->terminate)
+    {
+        for (pExprTree i : invariants)
+            loop_end->actions.push_back(new Assert(i));
+        for (auto &i : rank_f)
+            loop_end->actions.push_back(new Decrease(i));
+        loop_end->terminate = true;
+    }
+    loop_start->alter = cur_func->new_block(prev_ns);
 }
