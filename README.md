@@ -1,11 +1,118 @@
-# prj7_2020 静态检查与程序验证
+# prj7_2020 Program Verification: mdverif
 
-## 主要目标
+This is a study purpose formal verifier on a toy language. The syntax it works on is based on a subset of Minidecaf (a teaching purpose language used in the compiler course of Tsinghua University), but extended so that a programmer is able to write specifications about the property of a program.
 
-在MiniDecaf的某个子集上添加标注语法，并实现检查器，对程序进行验证。
+For detail syntax definition, see [mdverif.g4](generate/mdverif.g4).
 
-## 文件说明
+Each function in the input program is split into some basic paths. On each path, the verifier outputs a first order formula, called verification condition, or VC. The validity (if it is always true) of the VCs is checked with Z3Prover. If all of them are valid, the verifier reports that the program is verified. Otherwise, it complains that an execution path is problematic.
 
-`code/dafny_example`下是以Dafny语法写的样例代码，将来可能修改后用于测试检查器。
+## Usage
 
-`doc`目录下是文档，包含每次集中讨论的讲稿，被它们间接引用的文档，以及将来可能的其他文档。这些文档都会在wiki中被直接或间接地引用。
+1. Install Z3 library. (see [their github repo](https://github.com/Z3Prover/z3)) Make sure that Z3 headers and the shared library `libz3.so` are in your build environment.
+
+2. ```
+   $ mkdir build
+   $ cd build
+   $ cmake ..
+   $ make -j$(nproc)
+   ```
+
+3. `./mdverif <source code>`
+
+## Examples
+
+### Min
+
+Input:
+
+```C
+int min(int a, int b)
+    ensures result <= a && result <= b && (result == a || result == b)
+{
+    if (a < b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+```
+
+Output:
+
+```
+vc: ((ns0::a) < (ns0::b)) --> ((((ns0::a) <= (ns0::a)) && ((ns0::a) <= (ns0::b))) && (((ns0::a) == (ns0::a)) || ((ns0::a) == (ns0::b))))
+vc: (! ((ns0::a) < (ns0::b))) --> ((((ns0::b) <= (ns0::a)) && ((ns0::b) <= (ns0::b))) && (((ns0::b) == (ns0::a)) || ((ns0::b) == (ns0::b))))
+```
+
+### Bad Mid
+
+Input:
+
+```c
+int mid(int l, int r)
+    requires 0 <= l && l <= r
+    ensures l <= result && result <= r && 0 <= (r - result) - (result - l) && (r - result) - (result - l) <= 1
+{
+    return (l + r) / 2;
+}
+```
+
+Output:
+
+```
+vc: (((0) <= (ns0::l)) && ((ns0::l) <= (ns0::r))) --> (((((ns0::l) <= (((ns0::l) + (ns0::r)) / (2))) && ((((ns0::l) + (ns0::r)) / (2)) <= (ns0::r))) && ((0) <= (((ns0::r) - (((ns0::l) + (ns0::r)) / (2))) - ((((ns0::l) + (ns0::r)) / (2)) - (ns0::l))))) && ((((ns0::r) - (((ns0::l) + (ns0::r)) / (2))) - ((((ns0::l) + (ns0::r)) / (2)) - (ns0::l))) <= (1)))
+Verification failed in a basic path in function mid
+Verification failed.
+```
+
+### Good Mid
+
+Input:
+
+```c
+int mid(int l, int r)
+    requires 0 <= l && l <= r
+    ensures l <= result && result <= r && 0 <= (r - result) - (result - l) && (r - result) - (result - l) <= 1
+{
+    return l + (r - l) / 2;
+}
+```
+
+Output:
+
+```
+vc: (((0) <= (ns0::l)) && ((ns0::l) <= (ns0::r))) --> (((((ns0::l) <= ((ns0::l) + (((ns0::r) - (ns0::l)) / (2)))) && (((ns0::l) + (((ns0::r) - (ns0::l)) / (2))) <= (ns0::r))) && ((0) <= (((ns0::r) - ((ns0::l) + (((ns0::r) - (ns0::l)) / (2)))) - (((ns0::l) + (((ns0::r) - (ns0::l)) / (2))) - (ns0::l))))) && ((((ns0::r) - ((ns0::l) + (((ns0::r) - (ns0::l)) / (2)))) - (((ns0::l) + (((ns0::r) - (ns0::l)) / (2))) - (ns0::l))) <= (1)))
+Verified.
+```
+
+### Sum
+
+Input:
+
+```c
+int sum(int n)
+    requires 0 <= n && n <= 46340
+    ensures result == n * (n + 1) / 2
+{
+    int sum = 0;
+    int i;
+    for (i = 1; i <= n; i = i + 1)
+        invariant 0 <= n && n <= 46340
+        invariant 0 <= i && i <= n + 1 && sum == i * (i - 1) / 2
+        decrease (n + 1 - i)
+    {
+        sum = sum + i;
+    }
+    return sum;
+}
+```
+
+Output:
+
+```
+vc: (((0) <= (ns0::n)) && ((ns0::n) <= (46340))) --> ((((0) <= (ns0::n)) && ((ns0::n) <= (46340))) && (((((0) <= (1)) && ((1) <= ((ns0::n) + (1)))) && ((0) == (((1) * ((1) - (1))) / (2)))) && ((((ns0::n) + (1)) - (1)) >= (0))))
+vc: (((0) <= (ns0::n)) && ((ns0::n) <= (46340))) --> (((((0) <= (ns0::i)) && ((ns0::i) <= ((ns0::n) + (1)))) && ((ns0::sum) == (((ns0::i) * ((ns0::i) - (1))) / (2)))) --> ((((ns0::i) <= (ns0::n)) --> ((((0) <= (ns0::n)) && ((ns0::n) <= (46340))) && (((((0) <= ((ns0::i) + (1))) && (((ns0::i) + (1)) <= ((ns0::n) + (1)))) && (((ns0::sum) + (ns0::i)) == ((((ns0::i) + (1)) * (((ns0::i) + (1)) - (1))) / (2)))) && (((((ns0::n) + (1)) - ((ns0::i) + (1))) >= (0)) && ((((ns0::n) + (1)) - ((ns0::i) + (1))) < (((ns0::n) + (1)) - (ns0::i))))))) && ((((ns0::n) + (1)) - (ns0::i)) >= (0))))
+vc: (((0) <= (ns0::n)) && ((ns0::n) <= (46340))) --> (((((0) <= (ns0::i)) && ((ns0::i) <= ((ns0::n) + (1)))) && ((ns0::sum) == (((ns0::i) * ((ns0::i) - (1))) / (2)))) --> (((! ((ns0::i) <= (ns0::n))) --> ((ns0::sum) == (((ns0::n) * ((ns0::n) + (1))) / (2)))) && ((((ns0::n) + (1)) - (ns0::i)) >= (0))))
+Verified.
+```
+
