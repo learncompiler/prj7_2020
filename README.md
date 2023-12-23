@@ -1,10 +1,10 @@
 # prj7_2020 Program Verification: mdverif
 
-This is a study purpose formal verifier on a toy language. The syntax it works on is based on a subset of Minidecaf (a teaching purpose language used in the compiler course of Tsinghua University), but extended so that a programmer is able to write specifications about the property of a program.
+This is a study purpose formal verifier on a modified version of MiniDecaf (a C-like language for teaching purpose).
 
 For detail syntax definition, see [mdverif.g4](generate/mdverif.g4).
 
-Each function in the input program is split into some basic paths. On each path, the verifier outputs a first order formula, called verification condition, or VC. The validity (if it is always true) of the VCs is checked with Z3Prover. If all of them are valid, the verifier reports that the program is verified. Otherwise, it complains that an execution path is problematic.
+Each function in the input program is split into basic paths. On each path, the verifier generates its verification condition (VC), a first-order formula representing the correctness of the path. The validity of the VCs is checked with Z3Prover. If all of them are valid, the verifier reports that the program is verified. Otherwise, it complains that an execution path is problematic.
 
 ## Usage
 
